@@ -1,0 +1,25 @@
+{
+  "name": "prototypes",
+  "version": "1.0.0",
+  "description": "First prototype of TomoFastEx",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vtproduction/TomoFastExContract.git"
+  },
+  "keywords": [
+    "tomochain"
+  ],
+  "author": "Nien Le",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vtproduction/TomoFastExContract/issues"
+  },
+  "homepage": "https://github.com/vtproduction/TomoFastExContract#readme"
+}
