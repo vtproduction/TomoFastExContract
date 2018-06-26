@@ -1,0 +1,29 @@
+<html>
+<head>
+<script src="ethereumjs-tx.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+function decodeMyTx() {
+    var serializedTx = document.getElementById("inputarea").value.trim();
+    var tx = new EthTx(serializedTx);
+    var rawTx = {
+        nonce: parseInt(tx.nonce.toString('hex'),16),
+        gasPrice: parseInt(tx.gasPrice.toString('hex'),16),
+        gasLimit: parseInt(tx.gasLimit.toString('hex'),16),
+        to: '0x'+tx.to.toString('hex'),
+        value: parseInt(tx.value.toString('hex'), 16),
+        data: tx.data.toString('hex')
+    };
+    document.getElementById("outputarea").value = JSON.stringify(rawTx, null, "  ");
+}
+</script>
+<h1>Decode serialized transaction</h1>
+<textarea name="inputarea" id="inputarea"  cols="70" rows="3">
+</textarea>
+<br />
+<input type="submit" value="Decode" onclick="decodeMyTx()"/>
+<br />
+<textarea name="outputarea" id="outputarea"  cols="70" rows="10">
+</textarea>
+</body>

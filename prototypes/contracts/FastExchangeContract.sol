@@ -77,7 +77,7 @@ contract FastExchange is Owned, SafeMath {
     uint public constant minEther = 0.1 ether;
     uint public constant maxEther = 1 ether;
     uint public constant maxRateChange = 15; //no bigger than 5%
-    uint public constant expriedTime = 5 * 60 * 1000; //5 minute
+    uint public constant expriedTime = 5000; //5 secs
 
     mapping (address => FTransaction[]) transactionBook;
     mapping (address => uint) transactionCount;
@@ -88,6 +88,7 @@ contract FastExchange is Owned, SafeMath {
     event UpdateTransactionStatus(FTransaction _transaction);
     event CannotCreateNewTransaction(string mess);
     event Log(string mes);
+    event LogTime(uint time);
     //events
 
     //modifiers
@@ -128,7 +129,9 @@ contract FastExchange is Owned, SafeMath {
 
         FTransaction storage ft = transactionBook[_from][transactionCount[_from] - 1];
         if(ft.status != 4 && ft.statusTime[4] < now ){
-            emit Log("transaction expried!");
+            emit Log("transaction expried! ");
+            emit LogTime(ft.statusTime[4]);
+            emit LogTime(now);
             changeLastestTransactionStatus(_from, 4);
             return true;
         }
@@ -147,7 +150,8 @@ contract FastExchange is Owned, SafeMath {
             transactionCount[msg.sender]++;
             emit ReceivePendingTransaction(msg.sender);    
         }else{
-            revert();
+            emit Log("can not creat new transaction at 0");
+            //revert();
         }
     } 
 
