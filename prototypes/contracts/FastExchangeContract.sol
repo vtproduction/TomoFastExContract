@@ -89,6 +89,7 @@ contract FastExchange is Owned, SafeMath {
     event CannotCreateNewTransaction(string mess);
     event Log(string mes);
     event LogTime(uint time);
+    event LogTransaction(uint status, uint t1, uint t2, uint t3, uint t4, uint t5, uint t6);
     //events
 
     //modifiers
@@ -121,25 +122,31 @@ contract FastExchange is Owned, SafeMath {
         transactionBook[_from][transactionCount[_from] - 1].status = _status;
         transactionBook[_from][transactionCount[_from] - 1].statusTime[_status] = now;
     }
-    function canCreateNewTransaction(address _from) public returns (bool) {
-        if(transactionCount[_from] == 0) {
-            emit Log("count = 0");
-            return true;
+
+    function getLastestTransaction(address _from) public {
+        FTransaction memory ft = transactionBook[_from][transactionCount[_from] - 1];
+        emit LogTransaction(ft.status,ft.statusTime[0],ft.statusTime[1],ft.statusTime[2],ft.statusTime[3],ft.statusTime[4],now);
+    }
+
+    function canCreateNewTransaction(address _from) public returns (bool b) {
+        b = true;
+        return b;
+        /*if(transactionCount[_from] == 0) {
+            b = true;
+            emit LogTransaction(9999,0,0,0,0,0,now);
+            return b;
         }
 
         FTransaction storage ft = transactionBook[_from][transactionCount[_from] - 1];
         if(ft.status != 4 && ft.statusTime[4] < now ){
-            emit Log("transaction expried! ");
-            emit LogTime(ft.statusTime[4]);
-            emit LogTime(now);
             changeLastestTransactionStatus(_from, 4);
-            return true;
+            b = true;
         }
         if(ft.status == 0 || ft.status == 1) {
-            emit CannotCreateNewTransaction("transaction status == 0 or 1");
-            return false;
+            b = false;
         }
-        return true;
+        emit LogTransaction(ft.status,ft.statusTime[0],ft.statusTime[1],ft.statusTime[2],ft.statusTime[3],ft.statusTime[4],now);
+        return b;*/
     }
     
     
@@ -149,6 +156,7 @@ contract FastExchange is Owned, SafeMath {
             transactionBook[msg.sender].push(FTransaction(msg.sender, _ethValue, _estimateTokenRate, [now, 0, 0, 0, safeAdd(now, expriedTime)],0));
             transactionCount[msg.sender]++;
             emit ReceivePendingTransaction(msg.sender);    
+
         }else{
             emit Log("can not creat new transaction at 0");
             //revert();
