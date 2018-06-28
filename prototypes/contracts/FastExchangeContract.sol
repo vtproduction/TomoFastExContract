@@ -75,9 +75,9 @@ contract FastExchange is Owned, SafeMath {
     }
     
     uint public constant minEther = 0.1 ether;
-    uint public constant maxEther = 1 ether;
+    uint public constant maxEther = 5 ether;
     uint public constant maxRateChange = 15; //no bigger than 5%
-    uint public constant expriedTime = 5000; //5 secs
+    uint public constant expriedTime = 5 minutes; //5 mins
 
     mapping (address => FTransaction[]) transactionBook;
     mapping (address => uint) transactionCount;
@@ -112,7 +112,7 @@ contract FastExchange is Owned, SafeMath {
     modifier LastestTransactionIsPending(address _from) {
         require(transactionCount[_from] > 0);
         require(transactionBook[_from][transactionCount[_from] - 1].status == 0);
-        require(safeAdd(transactionBook[_from][transactionCount[_from] - 1].statusTime[0],expriedTime) < now);
+        require(safeAdd(transactionBook[_from][transactionCount[_from] - 1].statusTime[0],expriedTime) > now);
         _;
     }
     //modifiers
@@ -128,15 +128,12 @@ contract FastExchange is Owned, SafeMath {
         emit LogTransaction(ft.status,ft.statusTime[0],ft.statusTime[1],ft.statusTime[2],ft.statusTime[3],ft.statusTime[4],now);
     }
 
-    function canCreateNewTransaction(address _from) public returns (bool b) {
-        b = true;
-        return b;
-        /*if(transactionCount[_from] == 0) {
+    function canCreateNewTransaction(address _from) public constant onlyOwner returns (bool b) {
+        if(transactionCount[_from] == 0) {
             b = true;
-            emit LogTransaction(9999,0,0,0,0,0,now);
+            //emit LogTransaction(9999,0,0,0,0,0,now);
             return b;
         }
-
         FTransaction storage ft = transactionBook[_from][transactionCount[_from] - 1];
         if(ft.status != 4 && ft.statusTime[4] < now ){
             changeLastestTransactionStatus(_from, 4);
@@ -145,21 +142,20 @@ contract FastExchange is Owned, SafeMath {
         if(ft.status == 0 || ft.status == 1) {
             b = false;
         }
-        emit LogTransaction(ft.status,ft.statusTime[0],ft.statusTime[1],ft.statusTime[2],ft.statusTime[3],ft.statusTime[4],now);
-        return b;*/
+        //emit LogTransaction(ft.status,ft.statusTime[0],ft.statusTime[1],ft.statusTime[2],ft.statusTime[3],ft.statusTime[4],now);
+        return b;
     }
     
     
     function CreatePendingTransaction(uint _ethValue, uint _estimateTokenRate) 
-        public AccepableEther(_ethValue) {
+        public onlyOwner AccepableEther(_ethValue) {
         if (canCreateNewTransaction(msg.sender)) {
             transactionBook[msg.sender].push(FTransaction(msg.sender, _ethValue, _estimateTokenRate, [now, 0, 0, 0, safeAdd(now, expriedTime)],0));
             transactionCount[msg.sender]++;
             emit ReceivePendingTransaction(msg.sender);    
-
         }else{
             emit Log("can not creat new transaction at 0");
-            //revert();
+            revert();
         }
     } 
 
@@ -169,7 +165,15 @@ contract FastExchange is Owned, SafeMath {
     }
 
     function () public payable {
+        _processIncomingEther(msg.sender, msg.value);
+    }
 
+    
+
+
+    function _processIncomingEther(address _sender, uint _ethValue) private AccepableEther(_ethValue) LastestTransactionIsPending(_sender){
+        changeLastestTransactionStatus(_sender, 1);
+        uint maxEth = transactionBook[_from][transactionCount[_from] - 1];
     }
 }
 
