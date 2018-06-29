@@ -26,6 +26,24 @@ contract SafeMath {
 // Safe maths end
 // ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
+// ERC20 contract start
+// ----------------------------------------------------------------------------
+contract VenusToken {
+    function totalSupply() public constant returns (uint);
+    function balanceOf(address tokenOwner) public constant returns (uint balance);
+    function allowance(address tokenOwner, address spender) public constant returns (uint remaining);
+    function transfer(address to, uint tokens) public returns (bool success);
+    function approve(address spender, uint tokens) public returns (bool success);
+    function transferFrom(address from, address to, uint tokens) public returns (bool success);
+
+    event Transfer(address indexed from, address indexed to, uint tokens);
+    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
+}
+// ----------------------------------------------------------------------------
+// ERC20 contract end
+// ----------------------------------------------------------------------------
+
 
 // ----------------------------------------------------------------------------
 // Owned contract start
@@ -78,6 +96,8 @@ contract FastExchange is Owned, SafeMath {
     uint public constant maxEther = 5 ether;
     uint public constant maxRateChange = 15; //no bigger than 5%
     uint public constant expriedTime = 5 minutes; //5 mins
+    address tokenAddress;
+    address faucetAddress;
 
     mapping (address => FTransaction[]) transactionBook;
     mapping (address => uint) transactionCount;
@@ -160,8 +180,9 @@ contract FastExchange is Owned, SafeMath {
     } 
 
     //constructor
-    constructor() public {
-
+    constructor(address _tokenAddress, address _faucetAddress) public {
+        tokenAddress = _tokenAddress;
+        faucetAddress = _faucetAddress;
     }
 
     function () public payable {
@@ -173,7 +194,23 @@ contract FastExchange is Owned, SafeMath {
 
     function _processIncomingEther(address _sender, uint _ethValue) private AccepableEther(_ethValue) LastestTransactionIsPending(_sender){
         changeLastestTransactionStatus(_sender, 1);
-        uint maxEth = transactionBook[_from][transactionCount[_from] - 1];
+        VenusToken venusToken = VenusToken(tokenAddress);
+        uint maxEth = transactionBook[_sender][transactionCount[_sender] - 1].ethValue;
+        if (_ethValue < maxEth) {
+            revert();
+        } else {
+            uint tokenAmount = transactionBook[_sender][transactionCount[_sender] - 1] * estimatedTokenRate;
+            uint maxToken = venusToken.allowance(faucetAddress, this);
+            if (maxToken >= tokenAmount) {
+                tokenAmount = maxToken - tokenAmount;
+            } else {
+                tokenAmount = maxToken;
+            }
+            if (_ethValue > maxEth) {
+                
+            }
+        }
+
     }
 }
 
