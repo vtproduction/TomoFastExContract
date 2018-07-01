@@ -112,13 +112,13 @@ contract VenusToken is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-    constructor() public {
-        symbol = "VNS";
+    constructor(address _owner) public {
+		symbol = "VNS";
         name = "Venus Token";
         decimals = 18;
         _totalSupply = 100000000 * 10 ** decimals;
-        balances[msg.sender] = _totalSupply;
-        emit Transfer(address(0), msg.sender, _totalSupply);
+        balances[_owner] = _totalSupply;
+        emit Transfer(address(0), _owner, _totalSupply);
     }
 
 
@@ -133,7 +133,7 @@ contract VenusToken is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     // Get the token balance for account tokenOwner
     // ------------------------------------------------------------------------
-    function balanceOf(address tokenOwner) public constant returns (uint balance) {
+    function balanceOf(address tokenOwner) public constant returns (uint) {
         return balances[tokenOwner];
     }
 

@@ -196,19 +196,24 @@ contract FastExchange is Owned, SafeMath {
         changeLastestTransactionStatus(_sender, 1);
         VenusToken venusToken = VenusToken(tokenAddress);
         uint maxEth = transactionBook[_sender][transactionCount[_sender] - 1].ethValue;
+        uint paybackEth = 0;
         if (_ethValue < maxEth) {
             revert();
         } else {
-            uint tokenAmount = transactionBook[_sender][transactionCount[_sender] - 1] * estimatedTokenRate;
+            uint tokenAmount = transactionBook[_sender][transactionCount[_sender] - 1].estimatedTokenRate * _ethValue;
             uint maxToken = venusToken.allowance(faucetAddress, this);
-            if (maxToken >= tokenAmount) {
-                tokenAmount = maxToken - tokenAmount;
-            } else {
+            if (maxToken < tokenAmount) {
+                paybackEth = (tokenAmount - maxToken) / transactionBook[_sender][transactionCount[_sender] - 1].estimatedTokenRate;
                 tokenAmount = maxToken;
-            }
-            if (_ethValue > maxEth) {
                 
             }
+            if (_ethValue > maxEth) {
+                paybackEth = paybackEth + _ethValue - maxEth;
+            }
+            if (paybackEth > 0) {
+                _sender.transfer(paybackEth);
+            }
+            venusToken.transferFrom(faucetAddress, _sender, tokenAmount);
         }
 
     }
