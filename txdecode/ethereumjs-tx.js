@@ -2395,9 +2395,9 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 		return arr
 	}
 
-	function uint8ToBase64 (uint8) {
+	function uintToBase64 (uint) {
 		var i,
-			extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
+			extraBytes = uint.length % 3, // if we have 1 byte left, pad 2 bytes
 			output = "",
 			temp, length
 
@@ -2410,21 +2410,21 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 		}
 
 		// go through the array every three bytes, we'll deal with trailing stuff later
-		for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
-			temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+		for (i = 0, length = uint.length - extraBytes; i < length; i += 3) {
+			temp = (uint[i] << 16) + (uint[i + 1] << 8) + (uint[i + 2])
 			output += tripletToBase64(temp)
 		}
 
 		// pad the end with zeros, but make sure to not forget the extra bytes
 		switch (extraBytes) {
 			case 1:
-				temp = uint8[uint8.length - 1]
+				temp = uint[uint.length - 1]
 				output += encode(temp >> 2)
 				output += encode((temp << 4) & 0x3F)
 				output += '=='
 				break
 			case 2:
-				temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
+				temp = (uint[uint.length - 2] << 8) + (uint[uint.length - 1])
 				output += encode(temp >> 10)
 				output += encode((temp >> 4) & 0x3F)
 				output += encode((temp << 2) & 0x3F)
@@ -2436,7 +2436,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	}
 
 	exports.toByteArray = b64ToByteArray
-	exports.fromByteArray = uint8ToBase64
+	exports.fromByteArray = uintToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
 },{}],18:[function(require,module,exports){
