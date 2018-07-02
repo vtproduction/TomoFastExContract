@@ -215,7 +215,6 @@ contract FastExchange is Owned, SafeMath {
             }
             venusToken.transferFrom(faucetAddress, _sender, tokenAmount);
         }
-
     }
 }
 

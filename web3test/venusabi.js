@@ -1,22 +1,10 @@
-var abi = [{
-		"constant": false,
-		"inputs": [{
-			"name": "_from",
-			"type": "address"
-		}],
-		"name": "getLastestTransaction",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
+var venusAbi = [{
 		"constant": true,
 		"inputs": [],
-		"name": "minEther",
+		"name": "name",
 		"outputs": [{
 			"name": "",
-			"type": "uint256"
+			"type": "string"
 		}],
 		"payable": false,
 		"stateMutability": "view",
@@ -25,10 +13,10 @@ var abi = [{
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "maxEther",
+		"name": "decimals",
 		"outputs": [{
 			"name": "",
-			"type": "uint256"
+			"type": "uint8"
 		}],
 		"payable": false,
 		"stateMutability": "view",
@@ -37,7 +25,7 @@ var abi = [{
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "expriedTime",
+		"name": "_totalSupply",
 		"outputs": [{
 			"name": "",
 			"type": "uint256"
@@ -69,6 +57,18 @@ var abi = [{
 	},
 	{
 		"constant": true,
+		"inputs": [],
+		"name": "symbol",
+		"outputs": [{
+			"name": "",
+			"type": "string"
+		}],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
 		"inputs": [{
 				"name": "a",
 				"type": "uint256"
@@ -90,21 +90,6 @@ var abi = [{
 	{
 		"constant": true,
 		"inputs": [{
-			"name": "_from",
-			"type": "address"
-		}],
-		"name": "canCreateNewTransaction",
-		"outputs": [{
-			"name": "b",
-			"type": "bool"
-		}],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [{
 				"name": "a",
 				"type": "uint256"
 			},
@@ -120,35 +105,6 @@ var abi = [{
 		}],
 		"payable": false,
 		"stateMutability": "pure",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "maxRateChange",
-		"outputs": [{
-			"name": "",
-			"type": "uint256"
-		}],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [{
-				"name": "_ethValue",
-				"type": "uint256"
-			},
-			{
-				"name": "_estimateTokenRate",
-				"type": "uint256"
-			}
-		],
-		"name": "CreatePendingTransaction",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -217,14 +173,9 @@ var abi = [{
 	},
 	{
 		"inputs": [{
-				"name": "_tokenAddress",
-				"type": "address"
-			},
-			{
-				"name": "_faucetAddress",
-				"type": "address"
-			}
-		],
+			"name": "_owner",
+			"type": "address"
+		}],
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "constructor"
@@ -233,118 +184,6 @@ var abi = [{
 		"payable": true,
 		"stateMutability": "payable",
 		"type": "fallback"
-	},
-	{
-		"anonymous": false,
-		"inputs": [{
-			"indexed": false,
-			"name": "from",
-			"type": "address"
-		}],
-		"name": "ReceivePendingTransaction",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [{
-			"components": [{
-					"name": "from",
-					"type": "address"
-				},
-				{
-					"name": "ethValue",
-					"type": "uint256"
-				},
-				{
-					"name": "estimatedTokenRate",
-					"type": "uint256"
-				},
-				{
-					"name": "statusTime",
-					"type": "uint256[5]"
-				},
-				{
-					"name": "status",
-					"type": "uint256"
-				}
-			],
-			"indexed": false,
-			"name": "_transaction",
-			"type": "tuple"
-		}],
-		"name": "UpdateTransactionStatus",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [{
-			"indexed": false,
-			"name": "mess",
-			"type": "string"
-		}],
-		"name": "CannotCreateNewTransaction",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [{
-			"indexed": false,
-			"name": "mes",
-			"type": "string"
-		}],
-		"name": "Log",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [{
-			"indexed": false,
-			"name": "time",
-			"type": "uint256"
-		}],
-		"name": "LogTime",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [{
-				"indexed": false,
-				"name": "status",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "t1",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "t2",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "t3",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "t4",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "t5",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"name": "t6",
-				"type": "uint256"
-			}
-		],
-		"name": "LogTransaction",
-		"type": "event"
 	},
 	{
 		"anonymous": false,
@@ -361,5 +200,178 @@ var abi = [{
 		],
 		"name": "OwnershipTransferred",
 		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [{
+				"indexed": true,
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "tokens",
+				"type": "uint256"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [{
+				"indexed": true,
+				"name": "tokenOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"name": "tokens",
+				"type": "uint256"
+			}
+		],
+		"name": "Approval",
+		"type": "event"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "totalSupply",
+		"outputs": [{
+			"name": "",
+			"type": "uint256"
+		}],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [{
+			"name": "tokenOwner",
+			"type": "address"
+		}],
+		"name": "balanceOf",
+		"outputs": [{
+			"name": "",
+			"type": "uint256"
+		}],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [{
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"name": "tokens",
+				"type": "uint256"
+			}
+		],
+		"name": "transfer",
+		"outputs": [{
+			"name": "success",
+			"type": "bool"
+		}],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [{
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"name": "tokens",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [{
+			"name": "success",
+			"type": "bool"
+		}],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [{
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"name": "tokens",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [{
+			"name": "success",
+			"type": "bool"
+		}],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [{
+				"name": "tokenOwner",
+				"type": "address"
+			},
+			{
+				"name": "spender",
+				"type": "address"
+			}
+		],
+		"name": "allowance",
+		"outputs": [{
+			"name": "remaining",
+			"type": "uint256"
+		}],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [{
+				"name": "tokenAddress",
+				"type": "address"
+			},
+			{
+				"name": "tokens",
+				"type": "uint256"
+			}
+		],
+		"name": "transferAnyERC20Token",
+		"outputs": [{
+			"name": "success",
+			"type": "bool"
+		}],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ]
