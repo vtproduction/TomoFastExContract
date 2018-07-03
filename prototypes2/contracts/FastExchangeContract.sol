@@ -91,7 +91,7 @@ contract FastExchange is Owned, SafeMath {
         uint maxToken;
         uint refundEth;
         uint createdAt;
-        uint transferedAt;
+        uint transferredAt;
     }
     
     uint public constant minEth = 0.1 ether;
@@ -108,6 +108,7 @@ contract FastExchange is Owned, SafeMath {
     event CannotCreateNewTransaction(string mess);
     event Log(string mes);
     event LogTime(uint time);
+    event TransactionLog(address from, uint receivedEth, uint tokenRate, uint maxToken, uint refundEth, uint createdAt, uint transferredAt);
     //events
 
     //modifiers
@@ -128,14 +129,14 @@ contract FastExchange is Owned, SafeMath {
     
 
     //constructor
-    /* constructor(address _tokenAddress, address _faucetAddress) public {
+    constructor(address _tokenAddress, address _faucetAddress) public {
         tokenAddress = _tokenAddress;
         faucetAddress = _faucetAddress;
-    } */
+    } 
 
-    constructor() public {
+    /* constructor() public {
         
-    }
+    } */
 
     function () public payable {
         _processIncomingEther(msg.sender, msg.value);
@@ -144,6 +145,18 @@ contract FastExchange is Owned, SafeMath {
     function _processIncomingEther(address _sender, uint _ethValue) private AccepableEther(_ethValue) {
         transactionBook[_sender].push(FTransaction(_sender, _ethValue, 0, 0, 0, now, 0));
         emit ReceiveEth(_sender, transactionBook[_sender].length -1, _ethValue);  
+    }
+
+    function withdraw() public onlyOwner{
+        owner.transfer(address(this).balance);
+    }
+
+    function logAllTransactions(address from) {
+        FTransaction[] ta = transactionBook[from];
+        for (uint i = 0; i < ta.length; i++) {
+            FTransaction t = ta[i];
+            emit TransactionLog(t.from, t.receivedEth, t.tokenRate, t.maxToken, t.refundEth, t.createdAt, t.transferredAt);
+        }
     }
 
     function sendToken(address _sender, uint _transactionId, uint _tokenRate, uint _maxToken) public onlyOwner ValidTransactionId(_sender, _transactionId){
@@ -166,7 +179,7 @@ contract FastExchange is Owned, SafeMath {
         transactionBook[_sender][_transactionId].tokenRate = _tokenRate;
         transactionBook[_sender][_transactionId].maxToken = _maxToken;
         transactionBook[_sender][_transactionId].refundEth = refundEth;
-        transactionBook[_sender][_transactionId].transferedAt = now;
+        transactionBook[_sender][_transactionId].transferredAt = now;
         emit TokenTransfered(_sender, _transactionId, tokenToSend, refundEth, _tokenRate);
     }
 }
