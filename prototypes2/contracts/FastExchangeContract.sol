@@ -76,8 +76,7 @@ contract FastExchange is Owned, SafeMath {
         address from;
         uint receivedEth;
         uint tokenRate;
-        uint maxToken;
-        uint refundEth;
+        uint tokenAmount;
         uint createdAt;
         uint transferredAt;
     }
@@ -87,13 +86,14 @@ contract FastExchange is Owned, SafeMath {
     address tokenAddress;
     address faucetAddress;
 
-    mapping (address => FTransaction[]) transactionBook;
+    FTransaction[] transactions;
+    mapping (address => uint[]) transactionBook;
     //mapping (address => Transaction) lastestTransaction;
 
     //events
     event ReceiveEth(address from, uint transactionId, uint ethValue);
-    event TokenTransfered(address to, uint transactionId, uint tokenAmount, uint refundEth, uint tokenRate);
-    event TransactionLog(address from, uint receivedEth, uint tokenRate, uint maxToken, uint refundEth, uint createdAt, uint transferredAt);
+    event TokenTransferred(address to, uint transactionId, uint tokenAmount, uint refundEth, uint tokenRate);
+    event TransactionLog(address from, uint receivedEth, uint tokenRate, uint tokenAmount, uint createdAt, uint transferredAt);
     //events
 
     //modifiers
@@ -103,13 +103,13 @@ contract FastExchange is Owned, SafeMath {
         _;
     } 
 
-    modifier ValidTransactionId(address _sender, uint _transactionId) {
-        require(transactionBook[_sender].length - 1 >= _transactionId);
+    modifier ValidTransactionId(uint _transactionId) {
+        require(transactions.length - 1 >= _transactionId);
         _;
     }
 
-    modifier TransactionIsNotClosed(address _sender, uint _transactionId) {
-        require(transactionBook[_sender][_transactionId].transferredAt == 0);
+    modifier TransactionIsNotClosed(uint _transactionId) {
+        require(transactions[_transactionId].transferredAt == 0);
         _;
     }
     
@@ -125,7 +125,8 @@ contract FastExchange is Owned, SafeMath {
     }
 
     function _processIncomingEther(address _sender, uint _ethValue) private AccepableEther(_ethValue) {
-        transactionBook[_sender].push(FTransaction(_sender, _ethValue, 0, 0, 0, now, 0));
+        transactions.push(FTransaction(_sender, _ethValue, 0, 0, now, 0));
+        transactionBook[_sender].push(transactions.length - 1);
         emit ReceiveEth(_sender, transactionBook[_sender].length -1, _ethValue);  
     }
 
@@ -133,39 +134,50 @@ contract FastExchange is Owned, SafeMath {
         owner.transfer(address(this).balance);
     }
 
-    function logAllTransactions(address from) public {
-        FTransaction[] storage ta = transactionBook[from];
-        for (uint i = 0; i < ta.length; i++) {
-            FTransaction storage t = ta[i];
-            emit TransactionLog(t.from, t.receivedEth, t.tokenRate, t.maxToken, t.refundEth, t.createdAt, t.transferredAt);
+    function getTransactionDetail(uint _transactionId) public constant onlyOwner  ValidTransactionId(_transactionId) returns (address, uint, uint, uint, uint, uint){
+        FTransaction storage t = transactions[_transactionId];
+        return (t.from, t.receivedEth, t.tokenRate, t.tokenAmount, t.createdAt, t.transferredAt);
+    }
+
+    function getUserTransactionIndexes(address _user) public constant onlyOwner returns(uint[]) {
+        return transactionBook[_user];
+    }
+
+    function logAllTransactions(address _from) public {
+        uint[] storage ids = transactionBook[_from];
+        for (uint i = 0; i < ids.length; i++) {
+            FTransaction storage t = transactions[ids[i]];
+            emit TransactionLog(t.from, t.receivedEth, t.tokenRate, t.tokenAmount, t.createdAt, t.transferredAt);
         }
     }
 
-    function sendToken(address _sender, uint _transactionId, uint _tokenRate, uint _maxToken) public onlyOwner ValidTransactionId(_sender, _transactionId) TransactionIsNotClosed(_sender, _transactionId){
-        FTransaction storage t = transactionBook[_sender][_transactionId];
-        uint tokenToSend = safeMul(_tokenRate, t.receivedEth); 
+    function sendToken(uint _transactionId, uint _tokenRate) public onlyOwner ValidTransactionId(_transactionId) TransactionIsNotClosed(_transactionId){
+        FTransaction storage t = transactions[_transactionId];
         ERC20Token tokenContract = ERC20Token(tokenAddress);
         uint allowedToken = tokenContract.allowance(faucetAddress,this);
-        uint tokenBalance = tokenContract.balanceOf(faucetAddress);
-        if(allowedToken < _maxToken){
-            _maxToken = allowedToken;
+        uint maxToken = tokenContract.balanceOf(faucetAddress);
+        uint tokenToSend = safeMul(_tokenRate, t.receivedEth);
+        if(allowedToken < tokenToSend){
+            tokenToSend = allowedToken;
         }
-        if(tokenBalance < _maxToken){
-            _maxToken = tokenBalance;
+        if(maxToken < tokenToSend){
+            tokenToSend = maxToken;
         }
         uint refundEth = safeSub(t.receivedEth, safeMul(safeDiv(tokenToSend, _tokenRate),10**18));
         if(refundEth > 0){
-            _sender.transfer(refundEth);
+            t.from.transfer(refundEth);
         }
         if(tokenToSend > 0){
-            tokenContract.transferFrom(faucetAddress, _sender, tokenToSend);
+            tokenContract.transferFrom(faucetAddress, t.from, tokenToSend);
         }
-        transactionBook[_sender][_transactionId].tokenRate = _tokenRate;
-        transactionBook[_sender][_transactionId].maxToken = _maxToken;
-        transactionBook[_sender][_transactionId].refundEth = refundEth;
-        transactionBook[_sender][_transactionId].transferredAt = now;
-        emit TokenTransfered(_sender, _transactionId, tokenToSend, refundEth, _tokenRate);
+        t.tokenRate = _tokenRate;
+        t.tokenAmount = tokenToSend;
+        t.transferredAt = now;
+    
+        emit TokenTransferred(t.from, _transactionId, tokenToSend, refundEth, _tokenRate);
     }
+    
+    
 }
 // ----------------------------------------------------------------------------
 // FastExchange contract end

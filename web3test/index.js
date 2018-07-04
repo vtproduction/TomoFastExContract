@@ -21,14 +21,14 @@ window.onload = function () {
 
     });
 
-    var tokenTransferEv = contract.TokenTransfered({}, {
+    var tokenTransferEv = contract.TokenTransferred({}, {
         fromBlock: 0,
         toBlock: 'latest'
     });
     tokenTransferEv.watch(function (error, result) {
         if (!error) {
-        
-            console.log("on watch TokenTransfered ========");
+    
+            console.log("on watch TokenTransferred ========");
             console.log("to: " + result.args.to);
             console.log("transactionId:" + result.args.transactionId.toString());
             console.log("tokenAmount:" + result.args.tokenAmount.toString());
@@ -50,8 +50,6 @@ window.onload = function () {
             console.log("from: " + result.args.from);
             console.log("receivedEth:" + (result.args.receivedEth / 10 ** 18).toString());
             console.log("tokenRate:" + result.args.tokenRate.toString());
-            console.log("maxToken:" + result.args.maxToken.toString());
-            console.log("refundEth:" + (result.args.refundEth / 10 ** 18).toString());
             console.log("createdAt:" + result.args.createdAt.toString());
             console.log("transferredAt:" + result.args.transferredAt.toString());
             console.log("\n");

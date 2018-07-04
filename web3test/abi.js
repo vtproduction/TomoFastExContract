@@ -1,27 +1,6 @@
 var abi = [{
         "constant": true,
         "inputs": [],
-        "name": "maxEth",
-        "outputs": [{
-            "name": "",
-            "type": "uint256"
-        }],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [],
-        "name": "acceptOwnership",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
         "name": "owner",
         "outputs": [{
             "name": "",
@@ -29,122 +8,6 @@ var abi = [{
         }],
         "payable": false,
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [{
-                "name": "a",
-                "type": "uint256"
-            },
-            {
-                "name": "b",
-                "type": "uint256"
-            }
-        ],
-        "name": "safeSub",
-        "outputs": [{
-            "name": "c",
-            "type": "uint256"
-        }],
-        "payable": false,
-        "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [{
-                "name": "a",
-                "type": "uint256"
-            },
-            {
-                "name": "b",
-                "type": "uint256"
-            }
-        ],
-        "name": "safeDiv",
-        "outputs": [{
-            "name": "c",
-            "type": "uint256"
-        }],
-        "payable": false,
-        "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [{
-                "name": "a",
-                "type": "uint256"
-            },
-            {
-                "name": "b",
-                "type": "uint256"
-            }
-        ],
-        "name": "safeMul",
-        "outputs": [{
-            "name": "c",
-            "type": "uint256"
-        }],
-        "payable": false,
-        "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "newOwner",
-        "outputs": [{
-            "name": "",
-            "type": "address"
-        }],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [{
-                "name": "a",
-                "type": "uint256"
-            },
-            {
-                "name": "b",
-                "type": "uint256"
-            }
-        ],
-        "name": "safeAdd",
-        "outputs": [{
-            "name": "c",
-            "type": "uint256"
-        }],
-        "payable": false,
-        "stateMutability": "pure",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "minEth",
-        "outputs": [{
-            "name": "",
-            "type": "uint256"
-        }],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [{
-            "name": "_newOwner",
-            "type": "address"
-        }],
-        "name": "transferOwnership",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -221,36 +84,6 @@ var abi = [{
     {
         "anonymous": false,
         "inputs": [{
-            "indexed": false,
-            "name": "mess",
-            "type": "string"
-        }],
-        "name": "CannotCreateNewTransaction",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [{
-            "indexed": false,
-            "name": "mes",
-            "type": "string"
-        }],
-        "name": "Log",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [{
-            "indexed": false,
-            "name": "time",
-            "type": "uint256"
-        }],
-        "name": "LogTime",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [{
                 "indexed": false,
                 "name": "from",
                 "type": "address"
@@ -267,12 +100,7 @@ var abi = [{
             },
             {
                 "indexed": false,
-                "name": "maxToken",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "name": "refundEth",
+                "name": "tokenAmount",
                 "type": "uint256"
             },
             {
@@ -315,9 +143,60 @@ var abi = [{
         "type": "function"
     },
     {
+        "constant": true,
+        "inputs": [{
+            "name": "_transactionId",
+            "type": "uint256"
+        }],
+        "name": "getTransactionDetail",
+        "outputs": [{
+                "name": "",
+                "type": "address"
+            },
+            {
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [{
+            "name": "_user",
+            "type": "address"
+        }],
+        "name": "getUserTransactionIndexes",
+        "outputs": [{
+            "name": "",
+            "type": "uint256[]"
+        }],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "constant": false,
         "inputs": [{
-            "name": "from",
+            "name": "_from",
             "type": "address"
         }],
         "name": "logAllTransactions",
@@ -329,19 +208,11 @@ var abi = [{
     {
         "constant": false,
         "inputs": [{
-                "name": "_sender",
-                "type": "address"
-            },
-            {
                 "name": "_transactionId",
                 "type": "uint256"
             },
             {
                 "name": "_tokenRate",
-                "type": "uint256"
-            },
-            {
-                "name": "_maxToken",
                 "type": "uint256"
             }
         ],
