@@ -306,26 +306,6 @@ var abi = [{
         "type": "event"
     },
     {
-        "constant": true,
-        "inputs": [{
-                "name": "a",
-                "type": "uint256"
-            },
-            {
-                "name": "b",
-                "type": "uint256"
-            }
-        ],
-        "name": "testDiv",
-        "outputs": [{
-            "name": "",
-            "type": "uint256"
-        }],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "constant": false,
         "inputs": [],
         "name": "withdraw",
@@ -336,7 +316,10 @@ var abi = [{
     },
     {
         "constant": false,
-        "inputs": [],
+        "inputs": [{
+            "name": "from",
+            "type": "address"
+        }],
         "name": "logAllTransactions",
         "outputs": [],
         "payable": false,

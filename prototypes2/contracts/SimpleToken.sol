@@ -127,7 +127,6 @@ contract VenusToken is ERC20Interface, Owned, SafeMath {
     // Get the token balance for account tokenOwner
     // ------------------------------------------------------------------------
     function balanceOf(address tokenOwner) public constant returns (uint) {
-        emit Log(balances[tokenOwner]);
         return balances[tokenOwner];
     }
 

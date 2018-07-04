@@ -47,12 +47,13 @@ window.onload = function () {
         if (!error) {
 
             console.log("on watch TransactionLog ========");
-
-            /* console.log("to: " + result.args.to);
-            console.log("transactionId:" + result.args.transactionId.toString());
-            console.log("tokenAmount:" + result.args.tokenAmount.toString());
+            console.log("from: " + result.args.from);
+            console.log("receivedEth:" + (result.args.receivedEth / 10 ** 18).toString());
+            console.log("tokenRate:" + result.args.tokenRate.toString());
+            console.log("maxToken:" + result.args.maxToken.toString());
             console.log("refundEth:" + (result.args.refundEth / 10 ** 18).toString());
-            console.log("tokenRate:" + result.args.tokenRate.toString()); */
+            console.log("createdAt:" + result.args.createdAt.toString());
+            console.log("transferredAt:" + result.args.transferredAt.toString());
             console.log("\n");
         }
 

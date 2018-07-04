@@ -5,19 +5,19 @@ pragma solidity ^0.4.19;
 // Safe maths start
 // ----------------------------------------------------------------------------
 contract SafeMath {
-    function safeAdd(uint a, uint b) public pure returns (uint c) {
+    function safeAdd(uint a, uint b) internal pure returns (uint c) {
         c = a + b;
         require(c >= a);
     }
-    function safeSub(uint a, uint b) public pure returns (uint c) {
+    function safeSub(uint a, uint b) internal pure returns (uint c) {
         require(b <= a);
         c = a - b;
     }
-    function safeMul(uint a, uint b) public pure returns (uint c) {
+    function safeMul(uint a, uint b) internal pure returns (uint c) {
         c = a * b;
         require(a == 0 || c / a == b);
     }
-    function safeDiv(uint a, uint b) public pure returns (uint c) {
+    function safeDiv(uint a, uint b) internal pure returns (uint c) {
         require(b > 0);
         c = a / b;
     }
@@ -50,7 +50,6 @@ contract ERC20Token {
 // ----------------------------------------------------------------------------
 contract Owned {
     address public owner;
-    address public newOwner;
 
     event OwnershipTransferred(address indexed _from, address indexed _to);
 
@@ -61,17 +60,6 @@ contract Owned {
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
-    }
-
-    function transferOwnership(address _newOwner) public onlyOwner {
-        require(_newOwner != address(0));
-        newOwner = _newOwner;
-    }
-    function acceptOwnership() public {
-        require(msg.sender == newOwner);
-        emit OwnershipTransferred(owner, newOwner);
-        owner = newOwner;
-        newOwner = address(0);
     }
 }
 // ----------------------------------------------------------------------------
@@ -94,8 +82,8 @@ contract FastExchange is Owned, SafeMath {
         uint transferredAt;
     }
     
-    uint public constant minEth = 0.1 ether;
-    uint public constant maxEth = 5 ether;
+    uint private constant minEth = 0.1 ether;
+    uint private constant maxEth = 5 ether;
     address tokenAddress;
     address faucetAddress;
 
@@ -105,9 +93,6 @@ contract FastExchange is Owned, SafeMath {
     //events
     event ReceiveEth(address from, uint transactionId, uint ethValue);
     event TokenTransfered(address to, uint transactionId, uint tokenAmount, uint refundEth, uint tokenRate);
-    event CannotCreateNewTransaction(string mess);
-    event Log(string mes);
-    event LogTime(uint time);
     event TransactionLog(address from, uint receivedEth, uint tokenRate, uint maxToken, uint refundEth, uint createdAt, uint transferredAt);
     //events
 
@@ -123,8 +108,9 @@ contract FastExchange is Owned, SafeMath {
         _;
     }
 
-    function testDiv(uint a, uint b) public constant returns (uint) {
-        return safeDiv(a,b);
+    modifier TransactionIsNotClosed(address _sender, uint _transactionId) {
+        require(transactionBook[_sender][_transactionId].transferredAt == 0);
+        _;
     }
     
 
@@ -133,10 +119,6 @@ contract FastExchange is Owned, SafeMath {
         tokenAddress = _tokenAddress;
         faucetAddress = _faucetAddress;
     } 
-
-    /* constructor() public {
-        
-    } */
 
     function () public payable {
         _processIncomingEther(msg.sender, msg.value);
@@ -151,23 +133,25 @@ contract FastExchange is Owned, SafeMath {
         owner.transfer(address(this).balance);
     }
 
-    function logAllTransactions(address from) {
-        FTransaction[] ta = transactionBook[from];
+    function logAllTransactions(address from) public {
+        FTransaction[] storage ta = transactionBook[from];
         for (uint i = 0; i < ta.length; i++) {
-            FTransaction t = ta[i];
+            FTransaction storage t = ta[i];
             emit TransactionLog(t.from, t.receivedEth, t.tokenRate, t.maxToken, t.refundEth, t.createdAt, t.transferredAt);
         }
     }
 
-    function sendToken(address _sender, uint _transactionId, uint _tokenRate, uint _maxToken) public onlyOwner ValidTransactionId(_sender, _transactionId){
+    function sendToken(address _sender, uint _transactionId, uint _tokenRate, uint _maxToken) public onlyOwner ValidTransactionId(_sender, _transactionId) TransactionIsNotClosed(_sender, _transactionId){
         FTransaction storage t = transactionBook[_sender][_transactionId];
-        uint tokenToSend = safeMul(_tokenRate, t.receivedEth);
-        if(tokenToSend > _maxToken){
-            tokenToSend = _maxToken;
-        }
+        uint tokenToSend = safeMul(_tokenRate, t.receivedEth); 
         ERC20Token tokenContract = ERC20Token(tokenAddress);
-        if(tokenContract.allowance(faucetAddress,this) < tokenToSend){
-            tokenToSend = _maxToken;
+        uint allowedToken = tokenContract.allowance(faucetAddress,this);
+        uint tokenBalance = tokenContract.balanceOf(faucetAddress);
+        if(allowedToken < _maxToken){
+            _maxToken = allowedToken;
+        }
+        if(tokenBalance < _maxToken){
+            _maxToken = tokenBalance;
         }
         uint refundEth = safeSub(t.receivedEth, safeMul(safeDiv(tokenToSend, _tokenRate),10**18));
         if(refundEth > 0){
