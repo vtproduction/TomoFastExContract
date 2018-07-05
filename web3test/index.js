@@ -4,8 +4,23 @@ window.onload = function () {
     
     web3.eth.defaultAccount = web3.eth.accounts[0];
     var fastExchangeContract = web3.eth.contract(abi);
-    var contract = fastExchangeContract.at('0xde0310df95029f2c6a230c11ea7c82cb3dc45ed8');
-    var myEvent = contract.ReceiveEth({}, {
+    var contract = fastExchangeContract.at('0xed845a321698c3cd8bd0d883c8c718d63d7a30b3');
+    console.log((web3.eth.getBalance(contract.address) / 10**18).toString());
+
+    for(var j = 0; j < 10; j++){
+            for (var i = 1; i < 10; i++) {
+                web3.eth.sendTransaction({
+                    from: web3.eth.accounts[i],
+                    to: contract.address,
+                    value: web3.toWei(1, 'ether'),
+                    gas: 1000000
+                }, function (e, txId) {
+                    console.log(txId);
+                });
+            }
+            
+     }  
+    /* var myEvent = contract.ReceiveEth({}, {
         fromBlock: 0,
         toBlock: 'latest'
     });
@@ -56,20 +71,10 @@ window.onload = function () {
             console.log("\n");
         }
 
-    });
+    }); */
 
-   console.log(contract.getTransactionDetail(0));
-   web3.eth.sendTransaction({
-       from: web3.eth.accounts[1],
-       to: contract.address,
-       value: web3.toWei(0.5, 'ether'),
-       gas: 1000000
-   }, function(e,txId){
-        console.log(e);
-        console.log(txId);
-        
-        
-   });
+   //console.log(contract.getTransactionDetail(0));
+   
     
 };
 
