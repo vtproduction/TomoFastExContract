@@ -78,7 +78,7 @@ var abi = [{
                 "type": "uint256"
             }
         ],
-        "name": "TokenTransfered",
+        "name": "TokenTransferred",
         "type": "event"
     },
     {
@@ -120,6 +120,38 @@ var abi = [{
     {
         "anonymous": false,
         "inputs": [{
+                "indexed": false,
+                "name": "logName",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "name": "content",
+                "type": "uint256"
+            }
+        ],
+        "name": "LogNumber",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
+                "indexed": false,
+                "name": "logName",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "name": "content",
+                "type": "string"
+            }
+        ],
+        "name": "LogString",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{
                 "indexed": true,
                 "name": "_from",
                 "type": "address"
@@ -140,6 +172,18 @@ var abi = [{
         "outputs": [],
         "payable": false,
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getTransactionListLength",
+        "outputs": [{
+            "name": "length",
+            "type": "uint256"
+        }],
+        "payable": false,
+        "stateMutability": "view",
         "type": "function"
     },
     {

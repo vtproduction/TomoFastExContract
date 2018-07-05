@@ -1,17 +1,16 @@
 pragma solidity ^0.4.18;
 
 // ----------------------------------------------------------------------------
-// 'Venus' token contract
+// 'Nien' token contract
 //
 // Deployed to : 0x06B0101deae182492c4AD2fe5D3A28BA1b69F0F1
-// Symbol      : VNS
-// Name        : Venus Token
-// Total supply: 100000000
+// Symbol      : NIEN
+// Name        : Nien Token
+// Total supply: 100000
 // Decimals    : 18
 //
 // Enjoy.
 //
-// (c) by Moritz Neto with BokkyPooBah / Bok Consulting Pty Ltd Au 2017. The MIT Licence.
 // ----------------------------------------------------------------------------
 
 
@@ -19,19 +18,19 @@ pragma solidity ^0.4.18;
 // Safe maths
 // ----------------------------------------------------------------------------
 contract SafeMath {
-    function safeAdd(uint a, uint b) public pure returns (uint c) {
+    function safeAdd(uint a, uint b) internal pure returns (uint c) {
         c = a + b;
         require(c >= a);
     }
-    function safeSub(uint a, uint b) public pure returns (uint c) {
+    function safeSub(uint a, uint b) internal pure returns (uint c) {
         require(b <= a);
         c = a - b;
     }
-    function safeMul(uint a, uint b) public pure returns (uint c) {
+    function safeMul(uint a, uint b) internal pure returns (uint c) {
         c = a * b;
         require(a == 0 || c / a == b);
     }
-    function safeDiv(uint a, uint b) public pure returns (uint c) {
+    function safeDiv(uint a, uint b) internal pure returns (uint c) {
         require(b > 0);
         c = a / b;
     }
@@ -106,10 +105,10 @@ contract VenusToken is ERC20Interface, Owned, SafeMath {
     // Constructor
     // ------------------------------------------------------------------------
     constructor() public {
-		symbol = "VNS";
-        name = "Venus Token";
+		symbol = "NIEN";
+        name = "Nien Token";
         decimals = 18;
-        _totalSupply = 100000000 * 10 ** decimals;
+        _totalSupply = 100000 * 10 ** decimals;
         balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
