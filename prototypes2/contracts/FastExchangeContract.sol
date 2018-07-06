@@ -123,6 +123,11 @@ contract FastExchange is Owned, SafeMath {
         require(withdrawableEth > 0);
         _;
     }
+
+    modifier PreviousTransactionIsExecuted(uint transactionId) {
+        require(transactionId == 0 || transactions[transactionId - 1].transferredAt != 0);
+        _;
+    }
     
 
     //constructor
@@ -134,12 +139,19 @@ contract FastExchange is Owned, SafeMath {
         _processIncomingEther(msg.sender, msg.value);
     }
 
+    function getLockedEth() public onlyOwner constant returns(uint){
+        return lockedEth;
+    }
+
+    function getWithdrawableEth() public onlyOwner constant returns(uint){
+        return withdrawableEth;
+    }
     
 
     function _processIncomingEther(address _sender, uint _ethValue) private AccepableEther(_ethValue) {
         transactions.push(FTransaction(_sender, _ethValue, 0, 0, now, 0));
         transactionBook[_sender].push(transactions.length - 1);
-        safeAdd(lockedEth, _ethValue);
+        lockedEth = safeAdd(lockedEth, _ethValue);
         emit ReceiveEth(_sender, transactionBook[_sender].length -1, _ethValue);  
     }
 
@@ -171,19 +183,20 @@ contract FastExchange is Owned, SafeMath {
             if(transactions[i].transferredAt == 0) {
                 return (i,true);
             }
-            
         }
         return (0,false);
     }
 
-    function cancelTransaction(uint _transactionId) public onlyOwner ValidTransactionId(_transactionId) TransactionIsNotClosed(_transactionId){
+    function cancelTransaction(uint _transactionId) public onlyOwner ValidTransactionId(_transactionId) TransactionIsNotClosed(_transactionId)
+        PreviousTransactionIsExecuted(_transactionId) {
         FTransaction storage t = transactions[_transactionId];
         t.transferredAt = now;
         t.from.transfer(t.receivedEth);
+        lockedEth = safeSub(lockedEth, t.receivedEth);
     }
 
     function sendToken(uint _transactionId, uint _tokenRate, string _symbol) public onlyOwner ValidTransactionId(_transactionId) TransactionIsNotClosed(_transactionId)
-        ValidTokenAddress(_symbol){
+        PreviousTransactionIsExecuted(_transactionId) ValidTokenAddress(_symbol) {
         
         FTransaction storage t = transactions[_transactionId];
         ERC20Token tokenContract = ERC20Token(tokenAddresses[_symbol]);
@@ -193,14 +206,13 @@ contract FastExchange is Owned, SafeMath {
             tokenToSend = maxToken;
         }
         
-
         uint refundEth = safeSub(t.receivedEth, safeDiv(tokenToSend, _tokenRate));
-        safeSub(lockedEth, t.receivedEth);
+        lockedEth = safeSub(lockedEth, t.receivedEth);
         if(refundEth > 0){
             t.from.transfer(refundEth);
-            safeAdd(withdrawableEth, safeSub(t.receivedEth, refundEth));
+            withdrawableEth = safeAdd(withdrawableEth, safeSub(t.receivedEth, refundEth));
         }else{
-            safeAdd(withdrawableEth, t.receivedEth);
+            withdrawableEth = safeAdd(withdrawableEth, t.receivedEth);
         }
         if(tokenToSend > 0){
             tokenContract.transfer(t.from, tokenToSend);

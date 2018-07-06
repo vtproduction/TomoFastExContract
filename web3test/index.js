@@ -4,7 +4,7 @@ window.onload = function () {
     
     web3.eth.defaultAccount = web3.eth.accounts[0];
     var fastExchangeContract = web3.eth.contract(abi);
-    var contract = fastExchangeContract.at('0xed845a321698c3cd8bd0d883c8c718d63d7a30b3');
+    var contract = fastExchangeContract.at('0x364b6e7d71226f444cbe59ba7d2c13e96df69768');
     console.log((web3.eth.getBalance(contract.address) / 10**18).toString());
 
     for(var j = 0; j < 10; j++){
