@@ -1,9 +1,14 @@
+'use strict'
+const HDWalletProvider = require('truffle-hdwallet-provider')
+
 module.exports = {
   networks: {
-    ganache: {
-      host: "127.0.0.1",
-      port: 7545,
-      network_id: "*"
+    tomo: {
+      provider: function () {
+        return new HDWalletProvider(process.env.MNEMONIC, 'https://testnet.tomochain.com')
+      },
+      network_id: 89,
+      gasPrice: 1 // 1 wei
     }
   }
-};
+}

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.24;
 
 
 // ----------------------------------------------------------------------------
@@ -139,13 +139,7 @@ contract FastExchange is Owned, SafeMath {
         _processIncomingEther(msg.sender, msg.value);
     }
 
-    function getLockedEth() public onlyOwner constant returns(uint){
-        return lockedEth;
-    }
-
-    function getWithdrawableEth() public onlyOwner constant returns(uint){
-        return withdrawableEth;
-    }
+    
     
 
     function _processIncomingEther(address _sender, uint _ethValue) private AccepableEther(_ethValue) {
@@ -195,15 +189,18 @@ contract FastExchange is Owned, SafeMath {
         lockedEth = safeSub(lockedEth, t.receivedEth);
     }
 
-    function sendToken(uint _transactionId, uint _tokenRate, string _symbol) public onlyOwner ValidTransactionId(_transactionId) TransactionIsNotClosed(_transactionId)
+    function sendToken(uint _transactionId, uint _tokenRate, uint _maxTokenAmount, string _symbol) public onlyOwner ValidTransactionId(_transactionId) TransactionIsNotClosed(_transactionId)
         PreviousTransactionIsExecuted(_transactionId) ValidTokenAddress(_symbol) {
         
         FTransaction storage t = transactions[_transactionId];
         ERC20Token tokenContract = ERC20Token(tokenAddresses[_symbol]);
-        uint maxToken = tokenContract.balanceOf(this); 
+        uint tokenBalance = tokenContract.balanceOf(this); 
         uint tokenToSend = safeMul(_tokenRate, t.receivedEth); 
-        if(maxToken < tokenToSend){ 
-            tokenToSend = maxToken;
+        if(_maxTokenAmount < tokenToSend){
+            tokenToSend = _maxTokenAmount;
+        }
+        if(tokenBalance < tokenToSend){ 
+            tokenToSend = tokenBalance;
         }
         
         uint refundEth = safeSub(t.receivedEth, safeDiv(tokenToSend, _tokenRate));
@@ -220,7 +217,7 @@ contract FastExchange is Owned, SafeMath {
         t.tokenRate = _tokenRate;
         t.tokenAmount = tokenToSend;
         t.transferredAt = now;
-        emit TokenTransferred(t.from, _transactionId, tokenToSend, refundEth, _tokenRate);
+        //emit TokenTransferred(t.from, _transactionId, tokenToSend, refundEth, _tokenRate);
     }
     
     
